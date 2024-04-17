@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product - Sweet from Haven</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/dangNhapdangKy.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        // <div class="col">
+        //     <div class="card" style="height: 350px;">
+        //         <img src="../img/candy_corn.png" class="card-img-top" alt="Lỗi hình ảnh" height="170px">
+        //         <div class="card-body text-center">
+        //             <h3 style="font-family: JosedinSans;">Candy Corn haiuh foih iah fusi</h3><br>
+        //         </div>
+        //             <div class="card-footer text-center border-0" style="background-color: white">
+        //                 <span style="font-family: Merienda;">Giá: 14k</span>
+        //             <div>
+        //     </div>
+        // </div>
+        // <div class="col-lg-2 col-sm-4 col-12">
+        //      <a href="#" class="nav-link">a</a>
+        // </div>
+        // var types = ['All', 'Kẹo', 'Chocolate'];
+        types.sort();
+        var type = 'All';
+        function show(type, option){
+            switch(parseInt(option)){
+                case 1: products.sort(function(a, b){return a.name.localeCompare(b.name)});
+                break;
+                case 2: products.sort(function(a, b){return b.name.localeCompare(a.name)});
+                break;
+                case 3: products.sort(function(a, b){return a.gia > b.gia ? 1 : a.gia < b.gia ? -1 : 0;});
+                break;
+                case 4: products.sort(function(a, b){return a.gia > b.gia ? -1 : a.gia < b.gia ? 1 : 0;});
+                break;
+            }
+            $("#productList").html("");
+            if(products.length !== 0)
+                for(var p of products){
+                    if(p.type === type)
+                        $("#productList").append(createCard(p));
+                    else if(type === 'All')
+                        $("#productList").append(createCard(p));
+                }
+        }
+        function createType(data){
+            var a = $("<a></a>").text(data).attr({'class': 'nav-link', 'href': '#', 'style': 'font-family: DancingScript; font-size: 30px'});
+            a.click(function(){
+                type = data;
+                show(data);// không có tham số option thì option sẽ bằng undefine
+            });
+            var col = $("<div></div>").attr('class', 'col-lg-2 col-sm-4 col-12');
+            col.html(a);
+            return col;
+        }
+        function createCard(data){
+            var span = $("<span></span>").text('Giá: ' + data.gia + 'k').css({'font-family': 'Merienda'});
+            var h4 = $("<h4></h4>").text(data.name).css({'font-family': 'JosedinSans'});
+            var br = $("<br>");
+
+            var card_footer = $("<div></div>").addClass('card-footer text-center border-0').css({'background-color': 'white'});
+            card_footer.append(span);
+            var card_body = $("<div></div>").addClass('card-body text-center');
+            card_body.append(h4); card_body.append(br);
+            var img = $("<img>").attr({'src' : data.img, 'alt' : 'Lỗi hình ảnh', 'class': 'card-img-top', 'style': 'height: 170px;'});
+
+            var card = $("<div></div>").attr({'class': 'card my-2 overflow-y-scroll', 'style': 'height: 350px; cursor: pointer'});
+            card.append(img); card.append(card_body); card.append(card_footer);
+
+            card.hover(
+                function(){card.css({'trasition': 'transform 0.3s', 'transform': 'scale(1.05)'})},
+                function(){card.css({'trasition': 'transform 0.3s', 'transform': 'scale(1)'})}
+            );
+
+            card.click(function(){
+                var p = 'product';
+                localStorage.setItem(p, JSON.stringify(data));
+                window.location.replace("chiTietSanPham.html");
+            });
+
+            var col = $("<div></div>").addClass('col');
+            col.append(card);
+            return col;
+        }
+        $(document).ready(function () {
+            show('All');
+            if(types.length !== 0)
+                for(var t of types)
+                    $("#timKiem").append(createType(t));
+            $("#option").change(function(){show(type, $(this).val())})
+        });
+    </script>
+    <style>
+        @font-face {
+            font-family: 'JosedinSans';
+            src: url(font/JosefinSans-Regular.ttf);
+        }
+        @font-face {
+            font-family: 'Merienda';
+            src: url(font/Merienda-VariableFont_wght.ttf);
+        }
+        @font-face {
+            font-family: 'DancingScript';
+            src: url(font/DancingScript-VariableFont_wght.ttf);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row" style="background-color: rgb(255, 178, 225)">
+            <nav class="col-12 navbar navbar-expand-lg">
+                <a href="index.html">
+                    <img src="img/logo.png" alt="" width="100px" height="100px">
+                </a>
+                <button type="button" class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-navbar" style="width: 60px; height: 60px;">
+                    <span class="navbar-toggler-icon" style="width: 50px; height: 50px; margin-left: -7px;"></span>
+                </button>
+                <div class="offcanvas offcanvas-start" id="offcanvas-navbar" style="background-color: rgb(156, 111, 139);">
+                    <div class="offcanvas-header text-light">
+                        <h1>Lựa chọn</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav navbar-dark fw-bold fs-5">
+                            <li class="nav-item"><a href="sanPham.html" class="nav-link">Sản phẩm</a></li>
+                            <li class="nav-item"><a href="gioiThieu.html" class="nav-link">Giới thiệu</a></li>
+                            <li class="nav-item">
+                                <form action="" class="d-flex m-2">
+                                    <input type="text" class="form-control rounded-pill" placeholder="sweet search">
+                                    <a href="#">
+                                        <img src="img/magnifier.png" alt="" style="width: 30px;">
+                                    </a>
+                                </form>
+                            </li>
+                            <li class="nav-item collapse" id="li-signUp">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#card-signUp" role="button" id="mucDangNhap">Đăng nhập</a>
+                                <div class="collapse" id="card-signUp">
+                                    <div class="card card-body" style="font-size: 15px;">
+                                        <form action="">
+                                            <label for="">username</label>
+                                            <input type="text" class="form-control" id="username_signin"><br>
+                                            <span class="fw-normal text-danger" id="tbUsername"></span><br>
+                                            <label for="">password</label>
+                                            <input type="text" class="form-control" id="password">
+                                            <span class="fw-normal text-danger" id="tbPassword"></span><br>
+                                            <span>Chưa có tài khoản? Đăng ký tại <a href="dangKy.html">đây</a></span>
+                                            <p class="fw-normal text-danger" id="tbDangNhap"></p>
+                                            <button type="button" class="btn btn-primary" id="dangNhap" data-bs-toggle="collapse" data-bs-target="#card-signIn">Đăng nhập</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item collapse" id="li-signIn">
+                                <a class="nav-link d-flex" data-bs-toggle="collapse" href="#card-signIn" role="button">
+                                    <img src="img/user.png" alt="" width="35px" height="35px">
+                                </a>
+                                <div class="collapse" id="card-signIn">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <span id="username"></span><br>
+                                            <span id="email" class="fw-normal text-secondary" style="font-size: 15px;"></span>
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#card-signUp" id="dangXuat">Đăng xuất</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item" id="li-cart">
+                                <a href="cart.html" class="nav-link position-relative">
+                                    <img src="img/shopping-cart.png" alt="Lỗi hình ảnh" height="35px">
+                                    <span class="position-absolute badge rounded-pill bg-danger collapse" id="amount" style="bottom: 60%; left: 60%;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row mt-5">
+            <div class="col-md-9 col-12">
+                <form action="" id="timKiem" class="row">
+                </form>
+            </div>
+            <div class="col-md-3 col-12 border-start border-danger">
+                <select name="" id="option" class="form-select">
+                    <option value="1">Theo thứ tự A - Z</option>
+                    <option value="2">Theo thứ tự Z - A</option>
+                    <option value="3">Giá từ thấp lên cao</option>
+                    <option value="4">Giá từ cao xuống thấp</option>
+                </select>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <hr class="mt-1 border-danger" width="90%">
+        </div>
+        <div class="row row-cols-lg-6 row-cols-md-4 row-cols-2" id="productList">
+        </div>
+        <div class="row border-top bg-light">
+            <div class="col-12 px-lg-5">
+                <div>
+                    <h1 class="mb-3">Contact</h1>
+                    <p>
+                        <strong>Telephone</strong><br>
+                        (xxx) xxx-xxxx
+                    </p>
+                    <p>
+                        <strong>Address</strong><br>
+                        12 Nguyễn Văn Bảo, P.4, Q. Gò Vấp, TP.HCM
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    &copy; 2024 Sweet from Haven
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

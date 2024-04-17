@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart - Sweet from Haven</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/dangNhapdangKy.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        function botHang(p, amount){
+            var ca = {name: p.name, gia: p.gia, img: p.img, donViTinh: p.donViTinh, soLuong: amount, type: p.type};
+            soLuong -= parseInt(amount);
+            for(var car in cart){
+                if(cart[car].name === ca.name){
+                    cart[car].soLuong -= ca.soLuong;
+                    if(cart[car].soLuong === 0)
+                        cart.splice(car, 1);
+                    break;
+                }
+            }
+            if(soLuong === 0)
+                $("#amount").hide();
+            else
+                if(soLuong > 99)
+                    $("#amount").text("99+");
+                else
+                    $("#amount").text(soLuong);
+            localStorage.setItem(c, JSON.stringify(cart));
+        }
+        function themHang(p, amount){
+            var ca = {name: p.name, gia: p.gia, img: p.img, donViTinh: p.donViTinh, soLuong: amount, type: p.type};
+            soLuong += parseInt(amount);
+            var flag = 0;
+            for(var car in cart){
+                if(cart[car].name === ca.name){
+                    flag = 1;
+                    cart[car].soLuong += ca.soLuong;
+                    break;
+                }
+            }
+            if(flag === 0)cart.push(ca);
+            $("#amount").show();// trường hợp thêm lần đầu tiên
+            if(soLuong > 99)
+                $("#amount").text("99+");
+            else
+                $("#amount").text(soLuong);
+            localStorage.setItem(c, JSON.stringify(cart));
+        }
+        function afterboMatHang(data){
+            for(var cartt in cart){
+                if(cart[cartt].name === data.name){
+                    cart.splice(cartt, 1);
+                    soLuong -= data.soLuong;
+                    if(soLuong === 0)
+                        $("#amount").hide();
+                    else
+                        if(soLuong > 99)
+                            $("#amount").text("99+");
+                        else
+                            $("#amount").text(soLuong);
+                    localStorage.setItem(c, JSON.stringify(cart));
+                }
+            }
+        }
+        function boMatHang(data){
+            var arr = $("#matHang").children();
+            for(var cartt in cart){
+                if(cart[cartt].name === data.name){
+                    arr[cartt].remove();
+                    afterboMatHang(data);
+                    return;
+                }
+            }
+        }
+        function total(){
+            var totall = 0;
+            for(to of cart)totall += to.gia * to.soLuong;
+            $("#total").text(totall + "k")
+        }
+        // <div class="col-12 border-bottom border-danger">
+        //     <div class="row">
+        //         <div class="col-4">
+        //             <img src="../img/860_beryls-dark-chocolate-150g.jpg" alt="Lỗi hình ảnh" width="100%" height="300px">
+        //         </div>
+        //         <div class="col-8">
+        //             <p class="text-danger fs-2 fw-bold">Chocolate đen</p>
+        //             <p class="fs-5 fw-bold">20</p>
+        //             <div class="input-group w-25">
+        //                 <button type="button" class="btn btn-outline-dark rounded-start-pill">-</button>
+        //                 <input type="text" class="form-control">
+        //                 <button type="button" class="btn btn-outline-dark rounded-end-pill">+</button>
+        //             </div>
+        //             <p class="fs-5 fw-bold" style="margin-top: 50px;">20</p>
+        //         </div>
+        //     </div>
+        // </div>
+        function createMatHang(data){
+            for(pp of products){
+                if(data.name === pp.name)
+                    var ppp = pp;
+            }
+            var button1 = $("<button></button>").attr({'type': 'button', 'class': 'btn btn-outline-dark rounded-start-pill'}).text("-");
+            button1.click(function(){
+                var re = /^\d+$/;
+                var sluong = input.val();
+                if(!re.test(sluong))return;
+                var soLuongg = parseInt(input.val());
+                if(soLuongg === 1)return;
+                soLuongg -= 1;
+                input.val(soLuongg);
+                botHang(data, 1);
+
+                p3.text(soLuongg * data.gia + "k");
+
+                total();
+            });
+            var input = $("<input></input>").attr({'type': 'text', 'class': 'form-control'}).val(data.soLuong);
+            input.blur(function(){
+                var re = /^\d+$/;
+                var sluong = input.val();
+                if(!re.test(sluong)){
+                    span.text("Chỉ được phép nhập số nguyên");
+                    return;
+                }
+                if(parseInt(sluong) > ppp.soLuong){
+                    sluong = ppp.soLuong
+                    input.val(sluong);
+                }
+                span.text("");
+
+                p3.text(sluong * data.gia + "k");
+
+                if(sluong > data.soLuong)themHang(data, sluong - data.soLuong);
+                if(sluong < data.soLuong)botHang(data, data.soLuong - sluong);
+
+                total();
+            })
+            var button2 = $("<button></button>").attr({'type': 'button', 'class': 'btn btn-outline-dark rounded-end-pill'}).text("+");
+            button2.click(function(){
+                var re = /^\d+$/;
+                var sluong = input.val();
+                if(!re.test(sluong))return;
+                var soLuongg = parseInt(input.val());
+                if(soLuongg === ppp.soLuong)return;
+                soLuongg += 1;
+                input.val(soLuongg);
+                themHang(data, 1);
+
+                p3.text(soLuongg * data.gia + "k");
+
+                total();
+            });
+
+            var img = $("<img>").attr({'src': data.img, 'alt': 'Lỗi hình ảnh', 'width': '100%', 'height': '300px'});
+            var p1 = $("<p></p>").attr({'class': 'text-danger fs-2 fw-bold'}).text(data.name);
+            var p2 = $("<p></p>").attr({'class': 'fs-5 fw-bold'}).text(data.gia + "k");
+            var input_group = $("<div></div>").attr({'class': 'input-group w-25'});
+            input_group.append(button1); input_group.append(input); input_group.append(button2);
+            var span = $("<span></span>").attr({'class': 'fs-5'});
+            var p3 = $("<p></p>").attr({'class': 'fs-5 fw-bold', 'style': 'margin-top: 50px;'});
+            p3.text(data.soLuong * data.gia + "k");
+
+            var col_4 = $("<div></div>").addClass('col-4').append(img);
+            var col_8 = $("<div></div>").addClass('col-8');
+            col_8.append(p1); col_8.append(p2); col_8.append(input_group); col_8.append(span); col_8.append(p3);
+
+            var row = $("<div></div>").addClass('row');
+            row.append(col_4); row.append(col_8);
+
+            var close = $("<img>").attr({'src': 'img/close.png', 'alt': 'Lỗi hình ảnh', 'height': '30px', 'class': 'position-absolute top-0 end-0'});
+            close.attr('style', 'cursor: pointer');
+            close.click(function(){
+                boMatHang(data);
+                total();
+            })
+
+            var col_12 = $("<div></div>").addClass('col-12 border-bottom border-danger position-relative');
+            col_12.append(row); col_12.append(close);
+            return col_12;
+        }
+        $(document).ready(function () {
+            for(var cc of cart)
+                $("#matHang").append(createMatHang(cc));
+            total();
+            $("#thanhToan").click(function(){
+                if(tk !== null)
+                    window.location.replace('thanhToan.html');
+                $("#myModal").show();
+            });
+            $("#ok").click(function(){
+                $("#myModal").hide();
+            })
+        });
+    </script>
+    <style>
+        @font-face {
+            font-family: 'JosedinSans';
+            src: url(font/JosefinSans-Regular.ttf);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row" style="background-color: rgb(255, 178, 225)">
+            <nav class="col-12 navbar navbar-expand-lg">
+                <a href="index.html">
+                    <img src="img/logo.png" alt="" width="100px" height="100px">
+                </a>
+                <button type="button" class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-navbar" style="width: 60px; height: 60px;">
+                    <span class="navbar-toggler-icon" style="width: 50px; height: 50px; margin-left: -7px;"></span>
+                </button>
+                <div class="offcanvas offcanvas-start" id="offcanvas-navbar" style="background-color: rgb(156, 111, 139);">
+                    <div class="offcanvas-header text-light">
+                        <h1>Lựa chọn</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav navbar-dark fw-bold fs-5">
+                            <li class="nav-item"><a href="sanPham.html" class="nav-link">Sản phẩm</a></li>
+                            <li class="nav-item"><a href="gioiThieu.html" class="nav-link">Giới thiệu</a></li>
+                            <li class="nav-item">
+                                <form action="" class="d-flex m-2">
+                                    <input type="text" class="form-control rounded-pill" placeholder="sweet search">
+                                    <a href="#">
+                                        <img src="img/magnifier.png" alt="" style="width: 30px;">
+                                    </a>
+                                </form>
+                            </li>
+                            <li class="nav-item collapse" id="li-signUp">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#card-signUp" role="button" id="mucDangNhap">Đăng nhập</a>
+                                <div class="collapse" id="card-signUp">
+                                    <div class="card card-body" style="font-size: 15px;">
+                                        <form action="">
+                                            <label for="">username</label>
+                                            <input type="text" class="form-control" id="username_signin"><br>
+                                            <span class="fw-normal text-danger" id="tbUsername"></span><br>
+                                            <label for="">password</label>
+                                            <input type="text" class="form-control" id="password">
+                                            <span class="fw-normal text-danger" id="tbPassword"></span><br>
+                                            <span>Chưa có tài khoản? Đăng ký tại <a href="dangKy.html">đây</a></span>
+                                            <p class="fw-normal text-danger" id="tbDangNhap"></p>
+                                            <button type="button" class="btn btn-primary" id="dangNhap" data-bs-toggle="collapse" data-bs-target="#card-signIn">Đăng nhập</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item collapse" id="li-signIn">
+                                <a class="nav-link d-flex" data-bs-toggle="collapse" href="#card-signIn" role="button">
+                                    <img src="img/user.png" alt="" width="35px" height="35px">
+                                </a>
+                                <div class="collapse" id="card-signIn">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <span id="username"></span><br>
+                                            <span id="email" class="fw-normal text-secondary" style="font-size: 15px;"></span>
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#card-signUp" id="dangXuat">Đăng xuất</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item" id="li-cart">
+                                <a href="cart.html" class="nav-link position-relative">
+                                    <img src="img/shopping-cart.png" alt="Lỗi hình ảnh" height="35px">
+                                    <span class="position-absolute badge rounded-pill bg-danger collapse" id="amount" style="bottom: 60%; left: 60%;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            <div class="col-9">
+                <h1>Shopping Cart</h1>
+                <div class="row" id="matHang">
+                </div>
+            </div>
+            <div class="col-3 d-flex flex-column border-start border-danger">
+                <p class="text-danger fs-1 fw-bold">Tổng Tiền: <span id="total"></span></p>
+                <p style="font-family: JosedinSans;">Đừng nên để trong giỏ hàng quá lâu vì có thể số lượng hàng tồn sẽ bị giảm</p>
+                <button type="button" class="btn btn-danger rounded-pill fw-bold fs-3" id="thanhToan">Thanh Toán</button><br>
+                <p style="margin-top: 40px;"></p>
+                <a href="sanPham.html" class="nav-link fw-bold text-center fs-4">Tiếp tục mua hàng</a>
+            </div>
+        </div>
+        
+        <div class="row border-top bg-light">
+            <div class="col-12 px-lg-5">
+                <div>
+                    <h1 class="mb-3">Contact</h1>
+                    <p>
+                        <strong>Telephone</strong><br>
+                        (xxx) xxx-xxxx
+                    </p>
+                    <p>
+                        <strong>Address</strong><br>
+                        12 Nguyễn Văn Bảo, P.4, Q. Gò Vấp, TP.HCM
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    &copy; 2024 Sweet from Haven
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="myModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">Bạn phải đăng nhập để có thể thanh toán</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="ok">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

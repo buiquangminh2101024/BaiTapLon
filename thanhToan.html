@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThanhToan - Sweet form Haven</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/dangNhapdangKy.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        var diaChi = [{thanhPho: "TP.Hồ Chí Minh", quan: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "Bình Thạnh", "Gò Vấp", "Phú Nhuận", "Tân Bình"]}];
+        function themQuan(tp){
+            for(di of diaChi){
+                if(di.thanhPho === tp){
+                    $("#quan").text("");
+                    for(qu of di.quan)$("#quan").append($("<option></option>").val(qu).text(qu));
+                }
+            }
+        }
+        function themThanhPho(){
+            for(di of diaChi){
+                $("#thanhPho").append($("<option></option>").val(di.thanhPho).text(di.thanhPho));
+            }
+        }
+        function createMatHang(data){
+            var img = $("<img>").attr({'src': data.img, 'width': '30px', 'height': '30px'});
+
+            var amount = $("<span></span>").attr({'class': 'rounded-pill bg-danger text-light px-2'});
+            amount.text(data.soLuong);
+            var layoutAmount = $("<div></div>").attr({'style': 'position: absolute; top: -10px; left: 35px;'});
+            layoutAmount.append(amount);
+
+            var col1 = $("<div></div>").attr({'class': 'col-2 card card-body d-flex justify-align-center overflow-hidden', 'style': 'width: 40px; height: 40px;'});
+            col1.append(img);
+            var col2 = $("<div></div>").attr({'class': 'col-8'}).append(data.name);
+            var col3 = $("<div></div>").attr({'class': 'col-2'}).append(data.soLuong * data.gia + "k");
+
+            var row = $("<div></div>").attr({'class': 'row mt-3 position-relative'});
+            row.append(col1); row.append(col2); row.append(col3); row.append(layoutAmount);
+            return row;
+        }
+        function cacMatHang(){
+            for(cc of cart)$("#hoaDonn").append(createMatHang(cc));
+        }
+        function total(){
+            var totall = 0;
+            for(to of cart)totall += to.gia * to.soLuong;
+            $("#total").text(totall + "k")
+        }
+        $(document).ready(function () {
+            cacMatHang();
+            total();
+            themThanhPho();
+            themQuan("TP.Hồ Chí Minh");
+            $("#thanhPho").click(function(){
+                themQuan($(this).val());
+            });
+            var flag = 0;
+            var Ho = true;
+            $("#ho").blur(function(){
+                var re = /^[A-Z][a-z]{0,7}$/;
+                var ho = $("#ho").val();
+                if(!re.test(ho)){
+                    if(ho !== ""){
+                        $("#tbHo").text("Họ phải bắt đầu bằng chữ hoa và chỉ giới hạn được 8 kí tự");
+                        Ho = false;
+                    }
+                    else
+                        ("#tbHo").text("Nếu không nhập thì sẽ lấy họ đã đăng kí");
+                    return;
+                }
+                $("#tbHo").text("");
+            })
+            var Ten = true;
+            $("#ten").blur(function(){
+                var re = /^[A-Z][a-z]{0,7}$/;
+                var ten = $("#ten").val();
+                if(!re.test(ten)){
+                    if(ten !== ""){
+                        $("#tbTen").text("Họ phải bắt đầu bằng chữ hoa và chỉ giới hạn được 8 kí tự");
+                        Ten = false;
+                    }
+                    else
+                        $("#tbTen").text("Nếu không nhập thì sẽ lấy họ đã đăng kí");
+                        return;
+                }
+                $("#tbTen").text("");
+            })
+            var SDT = true;
+            $("#sdt").blur(function(){
+                var re = /^\d{3}-\d{3}-\d{4}$/;
+                var sdt = $("#sdt").val();
+                if(!re.test(sdt)){
+                    if(sdt !== ""){
+                        $("#tbSDT").text("Số điện thoại phải theo mẫu xxx-xxx-xxxx");
+                        SDT = false;
+                    }
+                    else
+                        $("#tbSDT").text("");
+                        return;
+                }
+                $("#tbSDT").text("");
+            })
+            var CardNumber = false;
+            $("#cardNumber").blur(function(){
+                var re = /^\d{20}$/;
+                var cardNumber = $("#cardNumber").val();
+                if(!re.test(cardNumber)){
+                    $("#tbCardNumber").text("Mã thẻ phải có 20 kí tự số");
+                    return;
+                }
+                $("#tbCardNumber").text("");
+                CardNumber = true;
+            })
+            var ExpirationDate = false;
+            $("#expirationDate").blur(function(){
+                var re = /^\d{2}\/\d{4}$/;
+                var date = $("#expirationDate").val();
+                if(!re.test(date)){
+                    $("#tbExpirationDate").text("Sai định dạng");
+                    return;
+                }
+                var arr = date.split('/');
+                var expirationDate = new Date(arr[1], arr[0] - 1);
+                if(expirationDate < new Date()){
+                    $("#tbExpirationDate").text("Ngày hết hạn đã qua tháng này");
+                    return;
+                }
+                $("#tbExpirationDate").text("");
+                ExpirationDate = true;
+            })
+            var TenTrenThe = false;
+            $("#tenTrenThe").blur(function(){
+                var re = /^([A-Z]{1,8} )*[A-Z]{1,8}$/;
+                var tenTrenThe = $("#tenTrenThe").val();
+                if(!re.test(tenTrenThe)){
+                    $("#tbTenTrenThe").text("Tên trên thẻ phải được viết hoa không dấu");
+                    return;
+                }
+                $("#tbTenTrenThe").text("");
+                TenTrenThe = true;
+            })
+            $("#thanhToan").click(function(){
+                if(!Ten || !Ho || !SDT || !CardNumber || !ExpirationDate || !TenTrenThe){
+                    alert("Bạn chưa nhập đầy đủ");
+                    return;
+                }
+                alert("Bạn đã mua thành công");
+                for(var cc of cart){
+                    for(pp in products){
+                        if(cc.name === products[pp].name){
+                            products[pp].soLuong -= cc.soLuong;
+                            break;
+                        }
+                    }
+                }
+                localStorage.setItem('products', JSON.stringify(products));
+                localStorage.setItem(c, null);
+                window.location.replace('index.html');
+            })
+        });
+    </script>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row" style="background-color: rgb(255, 178, 225)">
+            <nav class="col-12 navbar navbar-expand-lg">
+                <a href="index.html">
+                    <img src="img/logo.png" alt="" width="100px" height="100px">
+                </a>
+                <button type="button" class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvas-navbar" style="width: 60px; height: 60px;">
+                    <span class="navbar-toggler-icon" style="width: 50px; height: 50px; margin-left: -7px;"></span>
+                </button>
+                <div class="offcanvas offcanvas-start" id="offcanvas-navbar" style="background-color: rgb(156, 111, 139);">
+                    <div class="offcanvas-header text-light">
+                        <h1>Lựa chọn</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <ul class="navbar-nav navbar-dark fw-bold fs-5">
+                            <li class="nav-item"><a href="sanPham.html" class="nav-link">Sản phẩm</a></li>
+                            <li class="nav-item"><a href="gioiThieu.html" class="nav-link">Giới thiệu</a></li>
+                            <li class="nav-item">
+                                <form action="" class="d-flex m-2">
+                                    <input type="text" class="form-control rounded-pill" placeholder="sweet search">
+                                    <a href="#">
+                                        <img src="img/magnifier.png" alt="" style="width: 30px;">
+                                    </a>
+                                </form>
+                            </li>
+                            <!-- <li class="nav-item collapse" id="li-signUp">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#card-signUp" role="button" id="mucDangNhap">Đăng nhập</a>
+                                <div class="collapse" id="card-signUp">
+                                    <div class="card card-body" style="font-size: 15px;">
+                                        <form action="">
+                                            <label for="">username</label>
+                                            <input type="text" class="form-control" id="username_signin"><br>
+                                            <span class="fw-normal text-danger" id="tbUsername"></span><br>
+                                            <label for="">password</label>
+                                            <input type="text" class="form-control" id="password">
+                                            <span class="fw-normal text-danger" id="tbPassword"></span><br>
+                                            <span>Chưa có tài khoản? Đăng ký tại <a href="dangKy.html">đây</a></span>
+                                            <p class="fw-normal text-danger" id="tbDangNhap"></p>
+                                            <button type="button" class="btn btn-primary" id="dangNhap" data-bs-toggle="collapse" data-bs-target="#card-signIn">Đăng nhập</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item collapse" id="li-signIn">
+                                <a class="nav-link d-flex" data-bs-toggle="collapse" href="#card-signIn" role="button">
+                                    <img src="../img/user.png" alt="" width="35px" height="35px">
+                                </a>
+                                <div class="collapse" id="card-signIn">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <span id="username"></span><br>
+                                            <span id="email" class="fw-normal text-secondary" style="font-size: 15px;"></span>
+                                        </div>
+                                        <div class="card-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#card-signUp" id="dangXuat">Đăng xuất</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li> -->
+                            <li class="nav-item" id="li-cart">
+                                <a href="cart.html" class="nav-link position-relative">
+                                    <img src="img/shopping-cart.png" alt="Lỗi hình ảnh" height="35px">
+                                    <span class="position-absolute badge rounded-pill bg-danger collapse" id="amount" style="bottom: 60%; left: 60%;"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div class="row">
+            <div class="col-md-2 col-12"></div>
+            <div class="col-md-5 col-12">
+                <form action="">
+                    <label for="" class="fs-3">Vận Chuyển</label>
+                    <div class="row">
+                        <div class="col-md-5 col-12">
+                            <label for="">Họ</label>
+                            <input type="text" class="form-control" placeholder="Họ" id="ho">
+                            <span id="tbHo" class="text-danger">Nếu không nhập thì sẽ lấy họ đã đăng kí</span>
+                        </div>
+                        <div class="col-md-2 col-12"></div>
+                        <div class="col-md-5 col-12">
+                            <label for="">Tên</label>
+                            <input type="text" class="form-control" placeholder="Tên" id="ten">
+                            <span id="tbTen" class="text-danger">Nếu không nhập thì sẽ lấy tên đã đăng kí</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 col-12">
+                            <label for="">Thành Phố</label>
+                            <select name="" id="thanhPho" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="">Quận</label>
+                            <select name="" id="quan" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="">Địa chỉ cụ thể</label>
+                            <input type="text" class="form-control" id="diaChiCuThe" placeholder="Nhập địa chỉ cụ thể">
+                            <span id="tbDiaChiCuThe"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="">Số điện thoại:</label>
+                            <input type="text" class="form-control" id="sdt" placeholder="xxx-xxx-xxxx (Không nhất thiết)">
+                            <span id="tbSDT" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <p class="fs-4 float-start">Trả theo thẻ:</p>
+                            <ul class="nav float-end">
+                                <li class="nav-item">
+                                    <div class="card card-body d-flex justify-content-center overflow-hidden" style="width: 82px; height: 40px; position: relative;">
+                                        <img src="img/vietinbank.png" alt=""  width="70px" height="30px" style="position: absolute; left: 5px;">
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <div class="card card-body d-flex justify-content-center overflow-hidden" style="width: 82px; height: 40px; position: relative;">
+                                        <img src="img/vietcombank.png" alt="" width="70px" height="30px" style="position: absolute; left: 5px;">
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <div class="card card-body d-flex justify-content-center overflow-hidden" style="width: 82px; height: 40px; position: relative;">
+                                        <img src="img/VIB.webp" alt="" width="70px" height="40px" style="position: absolute; left: 10px;">
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <div class="card card-body d-flex justify-content-center overflow-hidden" style="width: 82px; height: 40px; position: relative;">
+                                        <img src="img/tpbank.webp" alt="" width="120px" style="position: absolute; left: -20px;">
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body row">
+                            <div class="col-12">
+                                <input type="text" class="form-control" placeholder="Số thẻ" id="cardNumber">
+                                <span id="tbCardNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <input type="text" class="form-control" placeholder="Ngày hết hạn (mm/yyyy)" id="expirationDate">
+                                <span id="tbExpirationDate" class="text-danger"></span>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <input type="text" class="form-control" placeholder="Tên trên thẻ" id="tenTrenThe">
+                                <span id="tbTenTrenThe" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center my-4 flex-column">
+                        <button type="button" class="btn btn-danger" id="thanhToan">Thanh Toán</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3 col-12 border-start">
+                <div class="row ms-3 col" id="hoaDonn">
+
+                </div>
+                <div class="row ms-3 mt-5 col d-flex">
+                    <p>Tổng cộng: <span id="total"></span></p>
+                </div>
+            </div>
+            <div class="col-md-2 col-12"></div>
+        </div>
+        <div class="row border-top bg-light">
+            <div class="col-12 px-lg-5">
+                <div>
+                    <h1 class="mb-3">Contact</h1>
+                    <p>
+                        <strong>Telephone</strong><br>
+                        (xxx) xxx-xxxx
+                    </p>
+                    <p>
+                        <strong>Address</strong><br>
+                        12 Nguyễn Văn Bảo, P.4, Q. Gò Vấp, TP.HCM
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    &copy; 2024 Sweet from Haven
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

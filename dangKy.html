@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignUp - Sweet from Haven</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        var taiKhoan = 'taiKhoans';
+        var taiKhoans = new Array();
+        var tk_str = 'tk';
+        var tk = JSON.parse(localStorage.getItem(tk_str));
+        var data = JSON.parse(localStorage.getItem(taiKhoan));
+        if(data !== null)
+            taiKhoans = taiKhoans.concat(data);
+        var username = false, password = false, ho = false, ten = false, email = false, ngaySinh = false, xacNhan = false;
+        $(document).ready(function () {
+            $("#username").blur(function(){
+                var u = $("#username").val();
+                if(u === ""){
+                    $("#tbUsername").text("Username không được bỏ trống");
+                    username = false
+                    return; 
+                }
+                if(taiKhoans.length !== 0)
+                for(var t of taiKhoans){
+                    if(u === t.username){
+                        $("#tbUsername").text("Username đã bị có người sử dụng");
+                        username = false
+                        return; 
+                    }
+                }
+                $("#tbUsername").text("");
+                username = true;
+            });
+            $("#password").blur(function(){
+                if($("#password").val() === ""){
+                    $("#tbPassword").text("Password không được bỏ trống");
+                    password = false
+                    return; 
+                }
+                $("#tbPassword").text("");
+                password = true;
+            });
+            $("#ho").blur(function(){
+                var re = /^[A-Z][a-z]*$/;
+                if(!re.test($("#ho").val())){
+                    $("#tbHo").text("Họ phải bắt đàu bằng chữ hoa");
+                    ho = false
+                    return; 
+                }
+                $("#tbHo").text("");
+                ho = true;
+            });
+            $("#ten").blur(function(){
+                var re = /^([A-Z][a-z]* )*[A-Z][a-z]*$/;
+                if(!re.test($("#ten").val())){
+                    $("#tbTen").text("Tên các chữ cái đầu phải bắt đầu bằng chữ hoa");
+                    ten = false
+                    return; 
+                }
+                $("#tbTen").text("");
+                ten = true;
+            });
+            $("#email").blur(function(){
+                var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+                if(!re.test($("#email").val())){
+                    $("#tbEmail").text("Sai định dạng email");
+                    email = false
+                    return; 
+                }
+                $("#tbEmail").text("");
+                email = true;
+            });
+            $("#ngaySinh").blur(function(){
+                if($(this).val() === ""){
+                    ngaySinh = false;
+                    $("#tbNgaySinh").text("Ngày sinh không được bỏ trống");
+                }
+                var date_str = $(this).val().split('-');
+                var date = new Date(date_str[0], date_str[1] - 1, date_str[2]);
+                var age = new Date();
+                age.setFullYear(age.getFullYear() - 18);
+                if(date >= age){
+                    $("#tbNgaySinh").text("Ngày sinh phải lớn hơn 18 tuổi");
+                    ngaySinh = false;
+                    return; 
+                }
+                $("#tbNgaySinh").text("");
+                ngaySinh = true;
+            });
+            $("#xacNhan").change(function(){
+                if(!$(this).is(":checked")){
+                    $("#tbXacNhan").text("Phải xác nhận để đăng ký");
+                    xacNhan = false;
+                    return;
+                }
+                $("#tbXacNhan").text("");
+                xacNhan = true;
+            })
+            $("#submit").click(function(){
+                console.log(username);
+                if(!username || !password || !ho || !ten || !email || !ngaySinh || !xacNhan){
+                    $("#alert_notFinishYet").show();
+                    return;
+                }
+                $("#alert_notFinishYet").hide();
+                var date_str = $("#ngaySinh").val().split('-');
+                tk = {username: $("#username").val(),
+                        password: $("#password").val(),
+                        ho: $("#ho").val(),
+                        ten: $("#ten").val(),
+                        email: $("#email").val(),
+                        ngaySinh: new Date(date_str[0], date_str[1] - 1, date_str[2])};
+                taiKhoans.push(tk);
+                localStorage.setItem(taiKhoan, JSON.stringify(taiKhoans));
+                localStorage.setItem(tk_str, JSON.stringify(tk));
+                window.open("index.html");
+            })
+        });
+    </script>
+    <style>
+        .carousel-control-prev-icon{
+            filter: invert(100%);
+        }
+        .carousel-control-next-icon{
+            filter: invert(100%);
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .shake-on-hover:hover {
+            animation: shake 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row" style="background-color: rgb(255, 178, 225)">
+            <nav class="col-12 navbar navbar-expand-lg d-flex justify-content-center">
+                <a href="index.html">
+                    <img src="img/logo.png" alt="" width="100%" height="100px">
+                </a>
+            </nav>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-12 overflow-y-scroll">
+                <form action="">
+                    <div class="row">
+                        <div class="col-md-6 col-12">
+                            <label for="" class="form-label">Username</label>
+                            <input type="text" class="form-control" placeholder="username" id="username" required>
+                            <span class="form-text text-danger" id="tbUsername"></span>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="" class="form-label">Password</label>
+                            <input type="text" class="form-control" placeholder="password" id="password" required>
+                            <span class="form-text text-danger" id="tbPassword"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-12">
+                            <label for="" class="form-label">Họ</label>
+                            <input type="text" class="form-control" placeholder="Họ" id="ho" required>
+                            <span class="form-text text-danger" id="tbHo"></span>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="" class="form-label">Tên</label>
+                            <input type="text" class="form-control" placeholder="Tên" id="ten" required>
+                            <span class="form-text text-danger" id="tbTen"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-12">
+                            <label for="" class="form-label">Email</label>
+                            <input type="email" class="form-control" placeholder="Email" id="email" required>
+                            <span class="form-text text-danger" id="tbEmail"></span>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="" class="form-label">Ngày sinh</label>
+                            <input type="date" class="form-control" id="ngaySinh" required>
+                            <span class="form-text text-danger" id="tbNgaySinh"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 my-3">
+                            <label for="" class="form-check-label">Nhấn nút này để đồng ý cung cấp thông tin của bạn cho chúng tôi</label>
+                            <input type="checkbox" class="form-check-input" id="xacNhan" required>
+                            <span class="form-text text-danger" id="tbXacNhan"></span>
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" id="submit">Đăng ký</button>
+                            <p></p>
+                            <div class="alert alert-danger collapse" id="alert_notFinishYet">Bạn chưa đáp ứng hết các yêu cầu</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6 col-12 px-0">
+                <img src="img/Đăng kí.png" alt="Lỗi hình ảnh" width="100%" height="450px" class="rounded-5 img-thumbnail shake-on-hover" style="box-shadow: 0 0 10px;">
+            </div>
+        </div>
+        <div class="row border-top bg-light">
+            <div class="col-12 px-lg-5">
+                <div>
+                    <h1 class="mb-3">Contact</h1>
+                    <p>
+                        <strong>Telephone</strong><br>
+                        (xxx) xxx-xxxx
+                    </p>
+                    <p>
+                        <strong>Address</strong><br>
+                        12 Nguyễn Văn Bảo, P.4, Q. Gò Vấp, TP.HCM
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    &copy; 2024 Sweet from Haven
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
