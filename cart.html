@@ -160,7 +160,7 @@
             var img = $("<img>").attr({'src': data.img, 'alt': 'Lỗi hình ảnh', 'width': '100%', 'height': '300px'});
             var p1 = $("<p></p>").attr({'class': 'text-danger fs-2 fw-bold'}).text(data.name);
             var p2 = $("<p></p>").attr({'class': 'fs-5 fw-bold'}).text(data.gia + "k");
-            var input_group = $("<div></div>").attr({'class': 'input-group w-25'});
+            var input_group = $("<div></div>").attr({'class': 'input-group', 'style': 'width: 150px'});
             input_group.append(button1); input_group.append(input); input_group.append(button2);
             var span = $("<span></span>").attr({'class': 'fs-5'});
             var p3 = $("<p></p>").attr({'class': 'fs-5 fw-bold', 'style': 'margin-top: 50px;'});
